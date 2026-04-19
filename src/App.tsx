@@ -1232,9 +1232,6 @@ export default function App() {
 
     if (!pendingReplyMessages.length) {
       setRehearsal(result.nextState);
-      if (result.kind === 'completed') {
-        showToast('剧本已排练完毕！');
-      }
       return;
     }
 
@@ -1261,10 +1258,6 @@ export default function App() {
             isLastMessage ? result.nextState.status : 'running'
           );
         });
-
-        if (isLastMessage && result.kind === 'completed') {
-          showToast('剧本已排练完毕！');
-        }
       }, THINKING_DELAY_MS + index * REPLY_STAGGER_MS);
 
       pendingReplyTimeoutsRef.current.add(timeoutId);
