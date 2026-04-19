@@ -256,4 +256,37 @@ describe('UI flows', () => {
     });
     expect(screen.queryByText('思考中')).not.toBeInTheDocument();
   });
+
+  it('does not show a completion toast when the rehearsal finishes', async () => {
+    const createdAt = '2026-04-19T10:00:00.000Z';
+    const script: ScriptRecord = {
+      ...createDefaultScript('完成剧本'),
+      id: 'completed-script',
+      name: '完成剧本',
+      createdAt,
+      updatedAt: createdAt,
+      messages: [
+        { id: 'm1', role: 'me', text: '你好', createdAt },
+        { id: 'o1', role: 'other', text: '你好呀', createdAt }
+      ],
+      turns: buildTurnsFromMessages([
+        { id: 'm1', role: 'me' as const },
+        { id: 'o1', role: 'other' as const }
+      ])
+    };
+
+    await saveScript(script);
+    await saveSelectedScriptId(script.id);
+
+    const user = userEvent.setup();
+    render(<App />);
+
+    await screen.findByText('完成剧本');
+    await user.type(screen.getByLabelText('排练输入框'), '你好{enter}');
+
+    await waitFor(() => expect(screen.getByText('你好呀')).toBeInTheDocument(), {
+      timeout: 2000
+    });
+    expect(screen.queryByText('剧本已排练完毕！')).not.toBeInTheDocument();
+  });
 });
